@@ -11,18 +11,7 @@ CHROME = pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Google', 'Chrome')
 YANDEX = pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Yandex', 'YandexBrowser')
 FIREFOX = pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Mozilla', 'Firefox')
 OPERA = pjoin(CD, 'Users', USERNAME, 'AppData', 'Roaming', 'Opera Software')
-
-def getChromeDriver():
-	r = get('https://chromedriver.storage.googleapis.com/')
-	cv = getChromeVersion()
-	cdv = cv + r.text.split('<Key>' + cv)[1].split('/')[0]
-	bytes = get('https://chromedriver.storage.googleapis.com/' + cdv + '/chromedriver_win32.zip').content
-	with open('chromedriver.zip', 'wb') as f:
-		f.write(bytes)
-	with ZipFile('chromedriver.zip', 'r') as z:
-		z.extractall(CHROME)
-	remove('chromedriver.zip')
-	return pjoin(CHROME, 'chromedriver')
+EDGE = pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Microsoft', 'Edge')
 
 def getChromeVersion():
 	paths = [pjoin(CD, 'Program Files', 'Google', 'Chrome', 'Application'), pjoin(CD, 'Program Files (x86)', 'Google', 'Chrome', 'Application'), pjoin(CHROME, 'Application')]
@@ -38,7 +27,40 @@ def getChromeVersion():
 			return file.split('.')[0]
 	return None
 
-def getOperaDriver():
+def getChromeDriver(update=False):
+	path = pjoin(CHROME, 'chromedriver.exe')
+	if not update and exists(path):
+		return path
+	r = get('https://chromedriver.storage.googleapis.com/')
+	cv = getChromeVersion()
+	cdv = cv + r.text.split('<Key>' + cv)[1].split('/')[0]
+	bytes = get('https://chromedriver.storage.googleapis.com/' + cdv + '/chromedriver_win32.zip').content
+	with open('chromedriver.zip', 'wb') as f:
+		f.write(bytes)
+	with ZipFile('chromedriver.zip', 'r') as z:
+		z.extractall(CHROME)
+	remove('chromedriver.zip')
+	return path
+
+def getOperaVersion():
+	paths = [pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Programs', 'Opera'), pjoin(CD, 'Program Files', 'Opera'), pjoin(CD, 'Program, Files (x86)', 'Opera')]
+	for i in range(len(paths)):
+		try:
+			dir = paths[i]
+			files = listdir(dir)
+			break
+		except:
+			pass
+	for file in files:
+		if isdir(pjoin(OPERA, file)):
+			if exists(pjoin(OPERA, file, 'opera.exe')):
+				return file.split('.')[0]
+	return None
+
+def getOperaDriver(update=False):
+	path = pjoin(opera, 'operadriver_win32', 'operadriver.exe')
+	if not update and exists(path):
+		return path
 	ov = getOperaVersion()
 	tags = get('https://api.github.com/repos/operasoftware/operachromiumdriver/tags').json()
 	for i in range(len(tags)):
@@ -61,10 +83,10 @@ def getOperaDriver():
 				return
 		except:
 			return
-	return pjoin(opera, 'operadriver_win32', 'operadriver')
+	return path
 
-def getOperaVersion():
-	paths = [pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Programs', 'Opera'), pjoin(CD, 'Program Files', 'Opera'), pjoin(CD, 'Program, Files (x86)', 'Opera')]
+def getYandexVersion():	
+	paths = [pjoin(CD, 'Program Files (x86)', 'Yandex', 'YandexBrowser'), pjoin(CD, 'Program Files', 'Yandex', 'YandexBrowser'), pjoin(YANDEX, 'Application')]
 	for i in range(len(paths)):
 		try:
 			dir = paths[i]
@@ -73,12 +95,14 @@ def getOperaVersion():
 		except:
 			pass
 	for file in files:
-		if isdir(pjoin(OPERA, file)):
-			if exists(pjoin(OPERA, file, 'opera.exe')):
-				return file.split('.')[0]
+		if isdir(pjoin(dir, file)) and file.__contains__('.'):
+			return file
 	return None
 
-def getYandexDriver():
+def getYandexDriver(update=False):
+	path = pjoin(YANDEX, 'yandexdriver.exe')
+	if not update and exists(path):
+		return path
 	yav = getYandexVersion()
 	yv = yav.replace('.' + yav.split('.')[3], '').replace('.', '')
 	tags = get('https://api.github.com/repos/yandex/YandexDriver/tags').json()
@@ -104,23 +128,12 @@ def getYandexDriver():
 	with ZipFile('yandexdriver.zip', 'r') as z:
 		z.extractall(YANDEX)
 	remove('yandexdriver.zip')
-	return pjoin(YANDEX, 'yandexdriver')
+	return path
 
-def getYandexVersion():	
-	paths = [pjoin(CD, 'Program Files (x86)', 'Yandex', 'YandexBrowser'), pjoin(CD, 'Program Files', 'Yandex', 'YandexBrowser'), pjoin(YANDEX, 'Application')]
-	for i in range(len(paths)):
-		try:
-			dir = paths[i]
-			files = listdir(dir)
-			break
-		except:
-			pass
-	for file in files:
-		if isdir(pjoin(dir, file)) and file.__contains__('.'):
-			return file
-	return None
-
-def getFirefoxDriver():
+def getFirefoxDriver(update=False):
+	path = pjoin(FIREFOX, 'geckodriver.exe')
+	if not update and exists(path):
+		return path
 	assets = get('https://api.github.com/repos/mozilla/geckodriver/releases/latest').json()['assets']
 	for i in range(len(assets)):
 		if assets[i]['name'].__contains__('win32'):
@@ -132,4 +145,33 @@ def getFirefoxDriver():
 	with ZipFile('firefoxdriver.zip', 'r') as z:
 		z.extractall(FIREFOX)
 	remove('firefoxdriver.zip')
-	return pjoin(FIREFOX, 'geckodriver')
+	return path
+
+def getEdgeVersion():
+	paths = [pjoin(CD, 'Program Files', 'Microsoft', 'Edge', 'Application'), pjoin(CD, 'Program Files (x86)', 'Microsoft', 'Edge', 'Application')]
+	for i in range(len(paths)):
+		try:
+			dir = paths[i]
+			files = listdir(dir)
+			break
+		except:
+			pass
+	for file in files:
+		if isdir(pjoin(dir, file)) and file.__contains__('.'):
+			return file.split('.')[0]
+	return None
+
+def getEdgeDriver(update=False):
+	path = pjoin(EDGE, 'msedgedriver.exe')
+	if not update and exists(path):
+		return path
+	r = get('https://msedgedriver.azureedge.net/')
+	ev = getEdgeVersion()
+	edv = ev + r.text.split('<Name>' + ev)[1].split('/')[0]
+	bytes = get('https://msedgewebdriverstorage.blob.core.windows.net/edgewebdriver/' + edv + '/edgedriver_win32.zip').content
+	with open('edgedriver.zip', 'wb') as f:
+		f.write(bytes)
+	with ZipFile('edgedriver.zip', 'r') as z:
+		z.extractall(EDGE)
+	remove('edgedriver.zip')
+	return path

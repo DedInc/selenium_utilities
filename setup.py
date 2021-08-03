@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name='selenium_utilities',
-    version='1.0.0',
+    version='1.0.1',
     author='Maehdakvan',
     author_email='visitanimation@google.com',
     description='Useful utilities for comfortable using selenium.',
