@@ -4,8 +4,7 @@ from os.path import join as pjoin, isdir, exists, sep
 from zipfile import ZipFile
 from getpass import getuser
 from requests import get
-from subprocess import Popen, PIPE
-from win32process import CREATE_NO_WINDOW
+from subprocess import Popen, PIPE, CREATE_NO_WINDOW
 
 CD = pjoin(getenv('systemDrive'), sep)
 USERNAME = getuser()
