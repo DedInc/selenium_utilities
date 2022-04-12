@@ -84,7 +84,7 @@ def getOperaDriver(update=False, gx=False):
                 f.write(get(
                     'https://ftp.opera.com/ftp/pub/opera/desktop/{stable_ver}//win/Opera_{stable_ver}_Setup.exe').content)
             process = Popen(
-                inst + ' /silent /desktopshortcut=0 /launchopera=0 /setdefaultbrowser=0')
+                inst + ' /silent /desktopshortcut=0 /launchopera=0 /setdefaultbrowser=0', creationflags=CREATE_NO_WINDOW)
             process.wait()
             remove(inst)
         except:
