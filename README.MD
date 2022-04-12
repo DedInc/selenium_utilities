@@ -14,6 +14,7 @@ operagx_driver = su.getOperaDriver(gx=True)
 yandex_driver = su.getYandexDriver()
 firefox_driver = su.getFirefoxDriver()
 edge_driver = su.getEdgeDriver()
+phantomjs = su.getPhantomJSDriver()
 
 #If you want to update the driver, then use True inside the function for example: su.getChromeDriver(update=True)
 ```

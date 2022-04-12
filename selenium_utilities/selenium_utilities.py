@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from os import getenv, remove, listdir
+from sys import platform
 from os.path import join as pjoin, isdir, exists, sep
 from zipfile import ZipFile
 from getpass import getuser
 from requests import get
 from subprocess import Popen, PIPE, CREATE_NO_WINDOW
+from lxml import html
+from tempfile import gettempdir
 
 CD = pjoin(getenv('systemDrive'), sep)
 USERNAME = getuser()
@@ -15,7 +18,7 @@ FIREFOX = pjoin(CD, 'Users', USERNAME, 'AppData',
                 'Local', 'Mozilla', 'Firefox')
 OPERA = pjoin(CD, 'Users', USERNAME, 'AppData', 'Roaming', 'Opera Software')
 EDGE = pjoin(CD, 'Users', USERNAME, 'AppData', 'Local', 'Microsoft', 'Edge')
-
+TEMP = gettempdir()
 
 def getChromeVersion():
     paths = [pjoin(CD, 'Program Files', 'Google', 'Chrome', 'Application'), pjoin(
@@ -81,7 +84,7 @@ def getOperaDriver(update=False, gx=False):
                 f.write(get(
                     'https://ftp.opera.com/ftp/pub/opera/desktop/{stable_ver}//win/Opera_{stable_ver}_Setup.exe').content)
             process = Popen(
-                inst + ' /silent /desktopshortcut=0 /launchopera=0 /setdefaultbrowser=0', creationflags=CREATE_NO_WINDOW)
+                inst + ' /silent /desktopshortcut=0 /launchopera=0 /setdefaultbrowser=0')
             process.wait()
             remove(inst)
         except:
@@ -181,7 +184,6 @@ def getFirefoxDriver(update=False):
     remove('firefoxdriver.zip')
     return path
 
-
 def getEdgeVersion():
     paths = [pjoin(CD, 'Program Files', 'Microsoft', 'Edge', 'Application'), pjoin(
         CD, 'Program Files (x86)', 'Microsoft', 'Edge', 'Application')]
@@ -213,3 +215,15 @@ def getEdgeDriver(update=False):
         z.extractall(EDGE)
     remove('edgedriver.zip')
     return path
+
+def getPhantomJSDriver(update=False):
+	path = pjoin(TEMP, 'phantomjs.exe')
+	if not update and exists(path):
+	    return path
+	tree = html.fromstring(get('https://phantomjs.org/download.html').content)
+	with open('phantomjs.zip', 'wb') as f:
+	    f.write(get(tree.xpath('/html/body/p[2]/a/@href')[0]).content)
+	with ZipFile('phantomjs.zip', 'r') as z:
+	    z.extractall(TEMP)
+	remove('phantomjs.zip')
+	return path

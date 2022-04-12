@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as f:
 
 setuptools.setup(
     name='selenium_utilities',
-    version='1.1.1',
+    version='1.2.0',
     author='Maehdakvan',
     author_email='visitanimation@google.com',
     description='Useful utilities for comfortable using selenium.',
@@ -22,6 +22,6 @@ setuptools.setup(
     ],
     packages=['selenium_utilities'],
     include_package_data = True,
-    install_requires = ['requests'],
-    python_requires='>=3.0',
+    install_requires = ['requests', 'lxml'],
+    python_requires='>=3.6',
 )
